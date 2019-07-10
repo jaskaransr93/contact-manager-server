@@ -1,0 +1,4 @@
+{
+    "mongoConn": "mongodb+srv://user:user@testcluster1-pzowf.mongodb.net/ContactManagerApp?retryWrites=true",
+    "jwtSecret": "secret"
+}
