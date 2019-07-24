@@ -12,7 +12,7 @@ var upload = multer({
 });
 const Contact  = require('../../models/Contact');
 const parser = require('../../utils/parser');
-
+//upload.single('avatar'),
 router.post('/', auth, upload.single('avatar'), async (req, res) => {
 
     try {
@@ -20,8 +20,8 @@ router.post('/', auth, upload.single('avatar'), async (req, res) => {
         const newContact = new Contact ({
             user: req.user.id,
             name: req.body.name,
-            phoneNumbers: parser.tryParse(req.body.phoneNumbers, []),
-            emails: parser.tryParse(req.body.emails, []),
+            phoneNumbers: req.body.phoneNumbers || [],
+            emails: req.body.emails || [],
             favourite: Boolean(req.body.favourite)
         });
 
@@ -108,7 +108,7 @@ router.post('/update/:id', auth, async (req, res) => {
 router.post('/notes', auth, async (req, res) => {
 
     try {
-        const dbContact = await Contact.findOne({
+        let dbContact = await Contact.findOne({
             _id: req.body.contactId,
             user: req.user.id
         });
@@ -119,10 +119,11 @@ router.post('/notes', auth, async (req, res) => {
         }
 
 
-
-       (dbContact.notes || []).push(req.body.description);
-    
-        const contactDB = await dbContact.save();
+        dbContact.notes = dbContact.notes || []
+        dbContact.notes.push(req.body.note);
+        
+        // const contactDB = await dbContact.save();
+        const contactDB = await Contact.findByIdAndUpdate(req.body.contactId, dbContact);
         res.send(contactDB);
     }
     catch(err) {
